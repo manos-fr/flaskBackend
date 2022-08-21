@@ -65,7 +65,7 @@ def get_titleById(id):
         key_list[7]: response[0][7],
         key_list[8]: response[0][8],
     }
-    return {'rows': res}
+    return {'rows': [res]}
 
 
 @app.route('/titles/<id>', methods=['DELETE'])
