@@ -1,7 +1,7 @@
 import psycopg2
 from psycopg2 import Error
-from flask import Flask, jsonify, request, Response
-from flask_restful import Resource, Api, reqparse
+from flask import Flask, request
+from flask_restful import Api
 from flask_cors import CORS
 
 app = Flask(__name__)
