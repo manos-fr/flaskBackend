@@ -10,7 +10,7 @@ def db():
         cursor = connection.cursor()
 
         cursor.execute("SELECT version();")
-
+        print("Connected to PostgreSQL")
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
 

@@ -4,6 +4,8 @@ from flask import Flask, request
 from flask_restful import Api
 from flask_cors import CORS
 
+from python_db import db
+
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
