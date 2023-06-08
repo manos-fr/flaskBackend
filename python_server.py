@@ -4,6 +4,8 @@ from psycopg2 import Error
 from flask import Flask, request
 from flask_restful import Api
 from flask_cors import CORS
+from timeit import default_timer as timer
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -12,10 +14,7 @@ CORS(app)
 @app.route('/titles', methods=['GET'])
 def get_titles():
     try:
-        cursor = connection.cursor()
-        cursor.execute(f"SELECT * FROM titles")
-        response = cursor.fetchall()
-        connection.commit() 
+        response = dbHandling() 
         key_list = ["tconst", "titletype", "originaltitle", "primarytitle",
             "isadult", "startyear", "endyear", "runtimeminutes", "genres"]
         res = []
@@ -35,6 +34,33 @@ def get_titles():
         return {'rows': res}
     except psycopg2.Error as e:
         print(f"Error executing SQL query: {e}")
+    # try:
+    #     key_list = ["tconst", "titletype", "originaltitle", "primarytitle",
+    #         "isadult", "startyear", "endyear", "runtimeminutes", "genres"]
+    #     res = []
+        
+    #     for i in range(0, 8):
+    #         res.append({
+    #             key_list[0]: 'response[i][0]',
+    #             key_list[1]: 'response[i][1]',
+    #             key_list[2]: 'response[i][2]',
+    #             key_list[3]: 'response[i][3]',
+    #             key_list[4]: 'response[i][4]',
+    #             key_list[5]: 'response[i][5]',
+    #             key_list[6]: 'response[i][6]',
+    #             key_list[7]: 'response[i][7]',
+    #             key_list[8]: 'response[i][8]',
+    #         })
+    #     return {'rows': res}
+    # except:
+    #     return {'error'}
+
+def dbHandling():
+    cursor = connection.cursor()
+    cursor.execute(f"SELECT * FROM titles")
+    response = cursor.fetchall()
+    connection.commit()
+    return response
 
 @app.route('/titles/<id>', methods=['GET'])
 def get_titleById(id):
@@ -77,12 +103,15 @@ def delete_titleById(id):
 @app.route('/titles', methods=['POST'])
 def create_title():
     try:
+        start = timer()
+        data = getJson()
+        startDb = timer()
         cursor = connection.cursor()
-        data: dict = request.get_json()
         cursor.execute(
             f"INSERT INTO titles (tconst, originaltitle, startyear, genres) VALUES ('{data.get('tconst')}{random.randint(1,1000000)}', '{data.get('originalTitle')}', {data.get('startYear')}, '{data.get('genres')}') RETURNING *")
         response = cursor.fetchall()
         connection.commit()
+        endDb = timer()
 
         key_list = ["tconst", "titletype", "originaltitle", "primarytitle",
                     "isadult", "startyear", "endyear", "runtimeminutes", "genres"]
@@ -100,6 +129,9 @@ def create_title():
             key_list[7]: response[0][7],
             key_list[8]: response[0][8],
         })
+        end = timer()
+        f = open("./resultsPost.txt", "a")
+        f.write(f"db: {(endDb - startDb)*1000} totRequest: {(end-start)*1000}\n")
         return {'rows': res}
     except psycopg2.Error as e:
             print(f"Error executing SQL query: {e}")
@@ -107,14 +139,25 @@ def create_title():
 @app.route('/titles/<id>', methods=['PUT'])
 def update_title(id):
     try:
-        cursor = connection.cursor()
-        data: dict = request.get_json()
-        cursor.execute(
-            f"UPDATE titles SET originaltitle= '{data.get('originalTitle')}', startyear= {data.get('startYear')}, genres= '{data.get('genres')}' WHERE tconst = '{id}'")
-        connection.commit() 
+        start = timer()
+        data = getJson()
+        startDb = timer()
+        dbHandlingPut(id, data) 
+        end = timer()
+        f = open("./results.txt", "a")
+        f.write(f"db: {(end - startDb)*1000} totRequest: {(end-start)*1000}\n")
         return {'message': f"Updated title with id: {id}"}
     except psycopg2.Error as e:
             print(f"Error executing SQL query: {e}")
+
+def dbHandlingPut(id, data):
+    cursor = connection.cursor()
+    cursor.execute(
+            f"UPDATE titles SET originaltitle= '{data.get('originalTitle')}', startyear= {data.get('startYear')}, genres= '{data.get('genres')}' WHERE tconst = '{id}'")
+
+def getJson():
+    data: dict = request.get_json()
+    return data
 
 
 def get_db_connection():

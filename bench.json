@@ -2,5 +2,9 @@
     "tconst": "999999",
     "originalTitle": "BENCHMOVIE",
     "startYear": 2020,
-    "genres": "BENCHMOVIE"
+    "genres": "BENCHMOVIE",
+    "titletype": "test", 
+    "primarytitle":"test",        
+    "isadult": "test", 
+    "endyear": "test"
 }
