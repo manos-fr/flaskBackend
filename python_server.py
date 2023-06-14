@@ -34,26 +34,6 @@ def get_titles():
         return {'rows': res}
     except psycopg2.Error as e:
         print(f"Error executing SQL query: {e}")
-    # try:
-    #     key_list = ["tconst", "titletype", "originaltitle", "primarytitle",
-    #         "isadult", "startyear", "endyear", "runtimeminutes", "genres"]
-    #     res = []
-        
-    #     for i in range(0, 8):
-    #         res.append({
-    #             key_list[0]: 'response[i][0]',
-    #             key_list[1]: 'response[i][1]',
-    #             key_list[2]: 'response[i][2]',
-    #             key_list[3]: 'response[i][3]',
-    #             key_list[4]: 'response[i][4]',
-    #             key_list[5]: 'response[i][5]',
-    #             key_list[6]: 'response[i][6]',
-    #             key_list[7]: 'response[i][7]',
-    #             key_list[8]: 'response[i][8]',
-    #         })
-    #     return {'rows': res}
-    # except:
-    #     return {'error'}
 
 def dbHandling():
     cursor = connection.cursor()
